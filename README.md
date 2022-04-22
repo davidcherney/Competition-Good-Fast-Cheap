@@ -84,17 +84,17 @@ The following table documents our scores (in percentage) for model trained on
 - balanced data
 - unbalanced data
 
-| Data      | f1    | Sensativity | Specificity | Precision|Train Accuracy|Validation Accuracy|
-| ---       | ---   | ---         | ---         | ---      | ---     | ---|
-| Polluted  | 92.99 | 96.04       | 89.48       | 90.14    | 98.87   |92.76|
-| Balanced  | 64.68 | 58.16        | 93.13       | 72.84    | 98.83   | 84.71|
-| Unbalanced    | 68.29 | 60.97       | 94.42       | 77.60    |88.43    |86.37|
+| Data      | f1   |Sensativity|Specificity|Precision|Train Accuracy|Validation Accuracy|
+| ---       | ---  | ---       | ---       | ---     | ---          | ---               |
+| Polluted  | 92.99|96.04      |89.48      | 90.14   | 98.87        | 92.76             |
+| Balanced  | 64.68|58.16      |93.13      | 72.84   | 98.83        | 84.71             |
+| Unbalanced| 68.29|60.97      |94.42      | 77.60   | 88.43        | 86.37             | 
 
 ---
 ## Conclusion
-The disadvantage of a small data set is a significant one; despite the sophistication and bredth of our binary classification model stacking, our sensativity score was very low.  Our model was trained on 4,884 samples with class sizes 3,708 and 1,176. Groups with tens of thousands of data points from which to train were able to achieve significantly higher f1 scores. 
+The disadvantage of a small data set is a significant one; despite the sophistication and bredth of our binary classification model stacking, our sensativity score was very low.  Our model was trained on 4,884 samples with class sizes 3,708 and 1,176. Another group with tens of thousands of data points from which to train models were able to achieve a significantly higher f1 score of 85.8%. 
 
-From our mistake, we conclude that data augmentation is a dangerous way to deal with data imbalance;  steps should be taken to understand the effects of the augmentation if it is applied. 
+From our mistake, polluting validation data with training data in the data balancing process, we conclude that data augmentation is a dangerous way to deal with data imbalance;  steps should be taken to understand the effects of the augmentation if it is applied. 
 
 
 
