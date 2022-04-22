@@ -13,18 +13,22 @@ Predict if income is in excess of $50,000 given other census data.
 
 Further, generate predicted probabilities of incommes being above $50,000 for each row in the test set. 
 
-This competition between 5 teams of data science fellow at General Assembly featured a different contraint for each team. Our team's constaint was a small number of samples. Teams were judged by their F1 score on the test set `test_data.csv` for which the incomes were not given.
+This competition between 5 teams of data science fellows at General Assembly featured a different contraint for each team. Our team's constaint was a small number of samples. This constraint was known as The Cheap Constraint in the Cheap-Fast-Good competition.
 
+
+Cheap Constraint:
 - Samples from which we could train models: 6,513
 
-- Samples to predict: 16,281.
+- Samples to predict: 16,281
+
+Teams were judged by their F1 score on the test set `test_data.csv` for which the incomes were not given.
 
 ---
-## Constraints
-#### Team Sample Constraint
+## The Cheap Constraint:
 - Your choice of algorithm
 - Your choice of features
-- Must use the cheap train sample
+- Must use the cheap train sample with 6,513 samples
+- Must generate predicions and probabilities for all 16,281 samples from train set
 
 
 ---
@@ -35,35 +39,39 @@ This competition between 5 teams of data science fellow at General Assembly feat
 ---
 ## Methodology
 ---
-#### **Data Cleaning**
+### EDA Notebook: 
+#### Data Cleaning
 
 - Checked for null values; there were none.
 - Resolved inconsistancy between `work-class` values in  ['never worked' ,'without pay'] and `hours_per_week` non-zero.
 - had some values that were '?' in categorical data that we one hot encoded, thus we did not need to impute.
 
 
-#### **EDA**
+#### EDA
 - Looked at each feature individually and decided how to encode data. (e.g.s one hot encoding, drop feature)
 - Looked for which features were most strongly correlated with income. 
 
 
-#### **Feature Engineering**
+### Model notebook
+#### Feature Engineering
 - Dumified features in train, validation, and test datasets simultaneously to ensure representation of all categorical values in all datasets.
 - Dropped features that 
     - we did not understand 
     - were unlikely to resolve income
     - contained categorical data better captured by another feature (e.g. years of school vs highest grade attended.)
+- engineered one quadratic feature: since greater education likely linearly correlates to hourly py rate, income likley correlates with education times hours worked per week, a quadratic feature.
 
 
 #### Data Imbalance
 We learned from our mistakes in attempting to deal with the imbalance of data, 76% income under 50k to 24% income over 50k. 
 
-**Initially** we upsampled the over 50k category, but made the mistake of augmenting  the over 50k category **while** the train and validation sets were concatenated. This artificially raised our validation accuracy by leaking training data into the validation set. The mistake, which gave an f1 score of 92.99% on validation data was corrected after the competition. 
+##### Description of Mistake and Subsequent Correction 
 
-**Secondarily,** we balanced the training data only. The result was a much lower f1 score of 64.41%. We believe that upsampling led to overfiting on the over 50k data poits by effectively giving three times the weight to each data point in the over 50k category as points in the unnder 50k category. This belief is supported by the  gap between train and val accuraccy closing from 14 points to 3 points in going from augmented/balanced data to unbalanced data.
+**Initially** we upsampled the over 50k category, but made the mistake of augmenting  the over 50k category **while** the train and validation sets were concatenated. This artificially raised our validation accuracy by leaking training data into the validation set. The mistake was corrected after the competition.  The severity of this mistake is visable in the table of scores below. 
 
-**Finally,** we used the original unbalanced data to fit the model. This imporved variance, and all matrics except train set accuracy. 
+**Secondarily,** we balanced the training data only. The result was a much lower f1 score (0.65 vs 0.93). We believe that the source of this very low f1score comes from upsampling of the over 50k class leading to overfiting on the over 50k data poits by effectively giving three times the weight to each data point in the over 50k category as points in the unnder 50k category. 
 
+**Finally,** we used the original unbalanced data to fit the model. This imporved variance, and all matrics except train set accuracy. Our belief that balancing data led to overfitting was supported by the gap between train and val accuraccy closing from 14 points to 2 points in going from augmented/balanced data to unbalanced data. 
 
 ## Modeing
 
@@ -71,38 +79,27 @@ We developed a stack model from the best version of KNN, Decision Tree Classifie
 
 ## Metrics
 
+The following table documents our scores (in percentage) for model trained on 
+- polluted data
+- balanced data
+- unbalanced data
 
-| data      | f1    | sensativity | specificity | precision|train accuracy|val acc|
+| Data      | f1    | Sensativity | Specificity | Precision|Train Accuracy|Validation Accuracy|
 | ---       | ---   | ---         | ---         | ---      | ---     | ---|
-| polluted  | 92.99 | 96.04       | 89.48       | 90.14    | 98.87   |92.76|
-| balanced  | 63.53 | 56.89       | 92.97       | 71.94    |98.80    |84.28|
-| unbalanced| 68.09 | 60.97       | 94.26       | 77.10    |89.21    |86.25| 
-
-Training on balanced data resulted in a model with f1 score of 64.41% on validation data. This score is low because f1 score is the harmonic mean of precision and sensativity, both of which were low at 72.15% and 58.16%, respectively. By contrast, our specificity score of 92.89% indicates that our model is much better at accurately pointing out that a person makes less than $50k per year than at accurately pointing out when they make more than 50k per year. 
-
-
-Training on the original unbalanced data gave a model with f1 score of 68.09%.  Precision and sensativity both went up by going back to unbalanced data, at 77.10% and 60.97% respectively.Surprisingly
-
-
-
-
-
-We note here that we did not win because we made the mistake of augmenting  the over 50k category while the train and validation sets were concatenated. This artificially raised our validation accuracy by leaking training data into the validation set. The mistake, which gave an f1 score of 92.99% on validation data was corrected after the competition. However, that correction led to a low sensativity by effectively giving three times the weight to each data point in the over 50k category as points in the unnder 50k category. 
-
+| Polluted  | 92.99 | 96.04       | 89.48       | 90.14    | 98.87   |92.76|
+| Balanced  | 64.68 | 58.16        | 93.13       | 72.84    | 98.83   | 84.71|
+| Unbalanced    | 68.29 | 60.97       | 94.42       | 77.60    |88.43    |86.37|
 
 ---
 ## Conclusion
-The disadvantage of a small data set is a significant one; despite the sophistication and bredth of our binary classification model stacking, our sensativity score was very low. 
+The disadvantage of a small data set is a significant one; despite the sophistication and bredth of our binary classification model stacking, our sensativity score was very low.  Our model was trained on 4,884 samples with class sizes 3,708 and 1,176. Groups with tens of thousands of data points from which to train were able to achieve significantly higher f1 scores. 
 
-Interestingly, if the binarization had been the opposite, 1 for under 50k and 0 for over, our f1 score would have been very different 81.22%. This difference of 16.81 points reflects the specificity of our model over sensativity, which was likely due to data imbalance in a small dataset and to the effective trippling of our under 50k datapoints in data augmentation. We conclude that data augmentation is a dangerous way to deal with data imbalance, and that steps should be taken to understand the effects of the augmentation if if is applied. 
+From our mistake, we conclude that data augmentation is a dangerous way to deal with data imbalance;  steps should be taken to understand the effects of the augmentation if it is applied. 
 
 
 
 
 ---
 ## Recommendations and Next Steps
-The next steps for this project would be to further tune the models to see if we can get a more accurate model. We did some feature engineering, but just ran out of time. Thus being able to try more engineered features might help improve this model as well.
+The next steps for this project would be to further tune the models to see if we can get a more accurate model. More engineered features might help improve this model as well.
 Ulitmately the best thing for this project would be more time to try more model parameters and features that take longer to run but could be more accurate.
-
-
-
